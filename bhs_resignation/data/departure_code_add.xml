@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="hr.departure_fired" model="hr.departure.reason">
+            <field name="departure_code">fired</field>
+        </record>
+
+        <record id="hr.departure_resigned" model="hr.departure.reason">
+            <field name="departure_code">resigned</field>
+        </record>
+
+        <record id="hr.departure_retired" model="hr.departure.reason">
+            <field name="departure_code">retired</field>
+        </record>
+    </data>
+</odoo>

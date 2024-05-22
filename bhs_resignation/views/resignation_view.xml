@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="bhs_employee_resignation_tree" model="ir.ui.view">
+            <field name="name">hr.resignation.tree</field>
+            <field name="model">hr.resignation</field>
+            <field name="inherit_id" ref="hr_resignation.employee_resignation_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="decoration-info">state == 'draft'</attribute>
+                    <attribute name="decoration-success">state == 'approved'</attribute>
+                    <attribute name="decoration-danger">state == 'confirm'</attribute>
+                    <attribute name="decoration-warning">state == 'manager_approved'</attribute>
+                    <attribute name="decoration-muted">state == 'cancel'</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="bhs_employee_resignation_form" model="ir.ui.view">
+            <field name="name">hr.resignation.form</field>
+            <field name="model">hr.resignation</field>
+            <field name="inherit_id" ref="hr_resignation.employee_resignation_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state']" position="replace">
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm,manager_approved,handed_over"/>
+                </xpath>
+                <xpath expr="//button[@name='approve_resignation']" position="replace">
+                    <button string="Manager Approve" type="object" groups="hr.group_hr_user" name="manager_approved_resignation" invisible="state != 'confirm'" class="oe_highlight"/>
+                    <button string="Complete Hand over" type="object" name="complete_hand_over_resignation" invisible="state != 'manager_approved'" class="oe_highlight"/>
+                    <button string="Approve" type="object" groups="hr.group_hr_manager" name="approve_resignation" invisible="state != 'handed_over'" class="oe_highlight"/>
+                </xpath>
+                <xpath expr="//button[@name='reject_resignation']" position="replace">
+                    <button string="Reject" type="object" groups="hr.group_hr_user" name="reject_resignation" invisible="state not in ['confirm','manager_approved','handed_over']"/>
+                </xpath>
+                <xpath expr="//field[@name='employee_contract']" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                    <attribute name="force_save">True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='notice_period']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='joined_date']" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                    <attribute name="force_save">True</attribute>
+                </xpath>
+                <xpath expr="//sheet" position="inside">
+
+                    <group string="Resignation Checklist" invisible="state in ['draft','confirm']">
+                        <group>
+                            <group>
+                                <field name="complete_employee_checklist"/>
+                            </group>
+                            <group>
+                                <field name="complete_checklist" invisible="state != 'handed_over'"/>
+                            </group>
+                        </group>
+                        <field name="checklist_ids">
+                            <tree editable="bottom" class="task_checklist" limit="200" create="0">
+                                <field name="sequence" widget="handle"/>
+                                <field name="check_box" string=" "/>
+                                <field name="name" placeholder="e.g. Just do it" decoration-muted="check_box == True" readonly="1" force_save="1"/>
+                                <field name="type" decoration-info="type == 'employee'" decoration-warning="type == 'manager'" decoration-danger="type == 'hr'" readonly="1" force_save="1"/>
+                            </tree>
+                        </field>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="employee_resignation_checklist_template_tree" model="ir.ui.view">
+            <field name="name">hr.resignation.checklist.template.tree</field>
+            <field name="model">hr.resignation.checklist.template</field>
+            <field name="priority" eval="8" />
+            <field name="arch" type="xml">
+                <tree string="Employee Resignation Checklist Template" editable="top">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="use_for"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="view_employee_resignation_checklist_template_act">
+            <field name="name">Employee Resignation Checklist Template</field>
+            <field name="res_model">hr.resignation.checklist.template</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Employee Resignation Checklist Template
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="employee_resignation_checklist_template_menu"
+                  name="Resignation Checklist Template"
+                  parent="hr.menu_config_employee"
+                  groups="hr.group_hr_manager"
+                  sequence="11"
+                  action="view_employee_resignation_checklist_template_act"
+        />
+
+
+        <record id='hr_resignation.view_employee_resignation' model='ir.actions.act_window'>
+            <field name="name">Employee Resignation</field>
+            <field name="res_model">hr.resignation</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', 'in', ('draft', 'confirm','manager_approved','handed_over','cancel'))]</field>
+        </record>
+    </data>
+</odoo>
+
+
