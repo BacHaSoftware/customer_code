@@ -18,6 +18,7 @@
         'views/resignation_view.xml'
 
     ],
+    'images': ['static/description/banner.gif'],
     'license': 'LGPL-3',
     'installable': True,
     'application': False
